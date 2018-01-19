@@ -18,7 +18,7 @@ describe('server start test', function() {
             .catch(done)
     })
 
-    it('/air-status', function(done) {
+    it('POST /air-status is ok', function(done) {
         request(app)
             .post('/air-status')
             .set('Accept', 'application/json')
