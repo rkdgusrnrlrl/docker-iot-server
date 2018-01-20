@@ -30,4 +30,18 @@ describe('server start test', function() {
             })
             .catch(done)
     })
+
+    it('POST /air-status is ok', function(done) {
+        request(app)
+            .post('/air-status')
+            .set('Accept', 'application/json')
+            .expect(400)
+            .then((res) => {
+                //TODO thkink error handler
+                //const errors = res.body.errors;
+                //expect(res.body.errors).to.be.equal(true)
+                done()
+            })
+            .catch(done)
+    })
 })
