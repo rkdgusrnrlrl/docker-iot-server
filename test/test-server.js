@@ -4,6 +4,7 @@
 const request = require('supertest');
 const app = require('../server');
 const chai = require('chai');
+chai.use(require('chai-things'));
 const expect = chai.expect;
 
 describe('server start test', function() {
@@ -37,9 +38,13 @@ describe('server start test', function() {
             .set('Accept', 'application/json')
             .expect(400)
             .then((res) => {
-                //TODO thkink error handler
-                //const errors = res.body.errors;
-                //expect(res.body.errors).to.be.equal(true)
+
+                const errors = res.body.errors;
+                expect(res.body.errors).to.have.lengthOf(2)
+
+                expect(res.body.errors).include.a.item.with.property("temp", "REQUIRE")
+                expect(res.body.errors).include.a.item.with.property("hum", "REQUIRE")
+
                 done()
             })
             .catch(done)
