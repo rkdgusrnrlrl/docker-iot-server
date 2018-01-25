@@ -40,10 +40,10 @@ describe('server start test', function() {
             .then((res) => {
 
                 const errors = res.body.errors;
-                expect(res.body.errors).to.have.lengthOf(2)
+                expect(errors).to.have.lengthOf(2)
 
-                expect(res.body.errors).include.a.item.with.property("temp", "REQUIRE")
-                expect(res.body.errors).include.a.item.with.property("hum", "REQUIRE")
+                expect(errors).include.a.item.with.property("temp", "REQUIRE")
+                expect(errors).include.a.item.with.property("hum", "REQUIRE")
 
                 done()
             })
@@ -73,9 +73,9 @@ describe('server start test', function() {
             .send({temp : 17, hum : 55})
             .expect(200)
 
-        const mongoose = require('mongoose');
-        mongoose.Promise = global.Promise;
-        mongoose.connect('mongodb://localhost/iot', { useMongoClient: true });
+        const mongoose = require('mongoose')
+        mongoose.Promise = global.Promise
+        mongoose.connect('mongodb://localhost/iot', { useMongoClient: true })
 
         const Sencer = mongoose.model('sencer', {  temp : Number ,hum: Number })
         const sencerDataList = await Sencer.find({}).lean().exec();
