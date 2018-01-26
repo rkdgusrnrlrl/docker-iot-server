@@ -6,8 +6,46 @@ const app = require('../server');
 const chai = require('chai');
 chai.use(require('chai-things'));
 const expect = chai.expect;
+const Docker = require('dockerode');
 
-describe('server start test', function() {
+describe('server start test', async function() {
+
+    let mongoContainer;
+    let mongoose = require('mongoose')
+
+    function sleep(milliseconds) {
+        const start = Date.now()
+        while ((Date.now() - start) < milliseconds) {}
+    }
+
+    before("", async function() {
+        const docker = new Docker({
+            socketPath: '/var/run/docker.sock'
+        });
+
+        mongoContainer = await docker.createContainer({
+            Image : "mongo",
+            ExposedPorts: {
+                "27017/tcp": {}
+            },
+            HostConfig : {
+                "PortBindings": { "27017/tcp": [{ "HostPort": "27017" }] },
+            }
+        })
+        await mongoContainer.start()
+        const stats = await mongoContainer.stats();
+
+        stats.on("data", (data) => {
+            console.log(data+"")
+        })
+
+        sleep(1000)
+
+        mongoose.connect('mongodb://localhost/iot', { useMongoClient: true })
+        mongoose.Promise = global.Promise
+
+    })
+
     it('/ is "Hello World!"', function(done) {
         request(app)
             .get('/')
@@ -51,21 +89,6 @@ describe('server start test', function() {
     })
 
     it('POST /air-status save data', async function() {
-        const Docker = require('dockerode');
-        const docker = new Docker({
-            socketPath: '/var/run/docker.sock'
-        });
-
-        const container = await docker.createContainer({
-            Image : "mongo",
-            ExposedPorts: {
-                "27017/tcp": {}
-            },
-            HostConfig : {
-                "PortBindings": { "27017/tcp": [{ "HostPort": "27017" }] },
-            }
-        })
-        await container.start()
 
         await request(app)
             .post('/air-status')
@@ -73,18 +96,18 @@ describe('server start test', function() {
             .send({temp : 17, hum : 55})
             .expect(200)
 
-        const mongoose = require('mongoose')
-        mongoose.Promise = global.Promise
-        mongoose.connect('mongodb://localhost/iot', { useMongoClient: true })
 
         const Sencer = mongoose.model('sencer', {  temp : Number ,hum: Number })
-        const sencerDataList = await Sencer.find({}).lean().exec();
-
+        const sencerDataList = await Sencer.find({}).lean().exec()
         expect(sencerDataList).to.have.lengthOf(1)
 
-        mongoose.disconnect()
+    }).timeout(10000)
 
-        await container.remove({force : true})
+    after("remove mongoContainer", async function () {
+        if (mongoose.connection.readyState ===1 || mongoose.connection.readyState ===2) {
+            mongoose.disconnect()
+        }
+        await mongoContainer.remove({force :true})
     })
 
 })
