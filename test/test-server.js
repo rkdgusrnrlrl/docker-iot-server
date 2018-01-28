@@ -70,7 +70,7 @@ describe('server start test', async function() {
             .catch(done)
     })
 
-    it('POST /air-status is ok', function(done) {
+    it('POST /air-status require temp and hum', function(done) {
         request(app)
             .post('/air-status')
             .set('Accept', 'application/json')
@@ -97,9 +97,9 @@ describe('server start test', async function() {
             .expect(200)
 
 
-        const Sencer = mongoose.model('sencer', {  temp : Number ,hum: Number })
-        const sencerDataList = await Sencer.find({}).lean().exec()
-        expect(sencerDataList).to.have.lengthOf(1)
+        const Sensor = mongoose.model('sensor', {  temp : Number ,hum: Number })
+        const sensorDataList = await Sensor.find({}).lean().exec()
+        expect(sensorDataList).to.have.lengthOf(1)
 
     }).timeout(10000)
 
