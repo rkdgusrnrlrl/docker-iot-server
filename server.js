@@ -1,11 +1,18 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser');
-app.use(bodyParser.json());
 
+app.use(bodyParser.json());
 app.get('/', (req, res) => res.send('Hello World!'))
 
-app.post('/air-status', (req, res) => {
+let mongoose = require('mongoose')
+mongoose.connect('mongodb://localhost/iot', { useMongoClient: true })
+mongoose.Promise = global.Promise
+const Sensor = require("./db/models/Sensor")
+
+
+
+app.post('/air-status', async (req, res) => {
 
     const temp = parseInt(req.body.temp, 10)
     const hum = parseInt(req.body.hum, 10)
@@ -14,7 +21,10 @@ app.post('/air-status', (req, res) => {
     if (isNaN(temp)) errors.push({temp : "REQUIRE"})
     if (isNaN(hum)) errors.push({hum : "REQUIRE"})
     if(errors.length > 0) return res.status(400).json({ errors : errors })
+    const now = new Date()
 
+    const sensor = new Sensor({date: now, temp : temp, hum : hum});
+    await sensor.save()
 
     res.json({ok : true})
 })
