@@ -7,6 +7,7 @@ const chai = require('chai');
 chai.use(require('chai-things'));
 const expect = chai.expect;
 const Docker = require('dockerode');
+const Sensor = require("../db/models/Sensor")
 
 describe('server start test', async function() {
 
@@ -33,11 +34,7 @@ describe('server start test', async function() {
             }
         })
         await mongoContainer.start()
-        const stats = await mongoContainer.stats();
-
-        stats.on("data", (data) => {
-            console.log(data+"")
-        })
+        await mongoContainer.stats();
 
         sleep(1000)
 
@@ -97,9 +94,8 @@ describe('server start test', async function() {
             .expect(200)
 
 
-        const Sensor = mongoose.model('sensor', {  temp : Number ,hum: Number })
         const sensorDataList = await Sensor.find({}).lean().exec()
-        expect(sensorDataList).to.have.lengthOf(1)
+        expect(sensorDataList).to.have.not.lengthOf(0)
 
     }).timeout(10000)
 
