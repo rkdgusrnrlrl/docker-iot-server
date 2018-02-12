@@ -2,7 +2,7 @@
 
 echo "Docker 빌드를 시작합니다."
 
-PROJECT_NAME="docker-pm2-sample"
+PROJECT_NAME="docker-iot-server"
 
 IMG_NAME="${PROJECT_NAME}-img"
 IMG_VER="0.01"
@@ -25,4 +25,4 @@ fi
 #run script
 #add docker container config
 #docker run -itd --name $CONT_NAME -v "${DIR}/log:/data/log" --network $DOCKER_NETWORK_NAME "${IMG_NAME}:${IMG_VER}"
-docker run -itd --name $CONT_NAME -v "${DIR}/log:/data/log" -p 80:80 "${IMG_NAME}:${IMG_VER}"
+docker run -itd --name $CONT_NAME -v "${DIR}/log:/data/log" -p 3000:3000 "${IMG_NAME}:${IMG_VER}"

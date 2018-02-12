@@ -1,5 +1,5 @@
 {
-  "name": "docker-pm2-sample",
+  "name": "docker-iot-server",
   "version": "1.0.0",
   "description": "docker pm2 container sample",
   "main": "server.js",
