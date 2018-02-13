@@ -1,0 +1,26 @@
+version: '3'
+
+networks:
+  docker-network:
+    external:
+      name : docker-network
+  iot-server-network:
+    driver : bridge
+
+services:
+  docker-iot-server-cont:
+    build: .
+    container_name: "docker-iot-server-cont"
+    ports:
+      - "3000:3000"
+    networks:
+      - docker-network
+    volumes:
+      - ./log:/data/log
+  mongodb:
+    image: mongo:3.6
+    container_name: mongodb
+    networks:
+      - docker-network
+    ports:
+      - "27017:27017"
